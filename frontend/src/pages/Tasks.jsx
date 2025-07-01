@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function PriorityBadge({ priority }) {
   const color = priority === 'high' ? '#ef4444' : priority === 'medium' ? '#f59e42' : '#16a34a';
@@ -91,8 +92,10 @@ export default function Tasks() {
   const [editTask, setEditTask] = useState(null);
   const [users, setUsers] = useState([]);
   const [projects, setProjects] = useState([]);
-  const [filter, setFilter] = useState({ status: 'all', priority: 'all', project: 'all' });
+  const [filter, setFilter] = useState({ status: 'all', priority: 'all', project: 'all', assignee: 'all', due: 'all' });
+  const [search, setSearch] = useState('');
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchAll();
@@ -115,6 +118,17 @@ export default function Tasks() {
     setLoading(false);
   }
 
+  async function logActivity({ action, taskId, details }) {
+    if (!user) return;
+    await supabase.from('activity_log').insert({
+      user_id: user.id,
+      task_id: taskId,
+      action,
+      details,
+      created_at: new Date().toISOString(),
+    });
+  }
+
   async function handleAddOrEdit(taskData) {
     setError('');
     const cleanData = {
@@ -125,8 +139,14 @@ export default function Tasks() {
     let result;
     if (editTask) {
       result = await supabase.from('tasks').update(cleanData).eq('id', editTask.id);
+      if (!result.error) {
+        await logActivity({ action: 'edited task', taskId: editTask.id, details: `Edited: ${cleanData.title}` });
+      }
     } else {
       result = await supabase.from('tasks').insert([{ ...cleanData, is_complete: false }]);
+      if (!result.error && result.data && result.data[0]) {
+        await logActivity({ action: 'created task', taskId: result.data[0].id, details: `Created: ${cleanData.title}` });
+      }
     }
     if (result.error) setError(result.error.message);
     else {
@@ -139,14 +159,18 @@ export default function Tasks() {
   async function handleDelete(id) {
     if (!window.confirm('Delete this task?')) return;
     const { error } = await supabase.from('tasks').delete().eq('id', id);
-    if (error) setError(error.message);
-    else fetchAll();
+    if (!error) {
+      await logActivity({ action: 'deleted task', taskId: id, details: 'Task deleted' });
+      fetchAll();
+    } else setError(error.message);
   }
 
   async function handleToggleComplete(task) {
     const { error } = await supabase.from('tasks').update({ is_complete: !task.is_complete }).eq('id', task.id);
-    if (error) setError(error.message);
-    else fetchAll();
+    if (!error) {
+      await logActivity({ action: task.is_complete ? 'marked incomplete' : 'completed task', taskId: task.id, details: task.title });
+      fetchAll();
+    } else setError(error.message);
   }
 
   // Filtering
@@ -154,12 +178,41 @@ export default function Tasks() {
   if (filter.status !== 'all') filteredTasks = filteredTasks.filter(t => filter.status === 'complete' ? t.is_complete : !t.is_complete);
   if (filter.priority !== 'all') filteredTasks = filteredTasks.filter(t => t.priority === filter.priority);
   if (filter.project !== 'all') filteredTasks = filteredTasks.filter(t => t.project_id === filter.project);
+  if (filter.assignee !== 'all') filteredTasks = filteredTasks.filter(t => t.assigned_to === filter.assignee);
+  if (filter.due !== 'all') {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    filteredTasks = filteredTasks.filter(t => {
+      if (!t.due_date) return false;
+      const due = new Date(t.due_date);
+      due.setHours(0,0,0,0);
+      if (filter.due === 'overdue') return !t.is_complete && due < today;
+      if (filter.due === 'today') return due.getTime() === today.getTime();
+      if (filter.due === 'upcoming') return due > today;
+      return true;
+    });
+  }
+  if (search.trim()) {
+    const s = search.trim().toLowerCase();
+    filteredTasks = filteredTasks.filter(t =>
+      t.title.toLowerCase().includes(s) ||
+      (t.description && t.description.toLowerCase().includes(s))
+    );
+  }
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Tasks</h1>
       <button className="add-task-btn" onClick={() => { setShowModal(true); setEditTask(null); }}>+ Add Task</button>
-      <div className="task-filters">
+      <div className="task-search-filters">
+        <input
+          className="modal-input"
+          style={{ maxWidth: 260, marginRight: 12 }}
+          type="text"
+          placeholder="Search tasks..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
         <select value={filter.status} onChange={e => setFilter(f => ({ ...f, status: e.target.value }))}>
           <option value="all">All</option>
           <option value="incomplete">Incomplete</option>
@@ -174,6 +227,16 @@ export default function Tasks() {
         <select value={filter.project} onChange={e => setFilter(f => ({ ...f, project: e.target.value }))}>
           <option value="all">All Projects</option>
           {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+        <select value={filter.assignee} onChange={e => setFilter(f => ({ ...f, assignee: e.target.value }))}>
+          <option value="all">All Assignees</option>
+          {users.map(u => <option key={u.id} value={u.id}>{u.full_name || u.email}</option>)}
+        </select>
+        <select value={filter.due} onChange={e => setFilter(f => ({ ...f, due: e.target.value }))}>
+          <option value="all">All Due Dates</option>
+          <option value="overdue">Overdue</option>
+          <option value="today">Due Today</option>
+          <option value="upcoming">Upcoming</option>
         </select>
       </div>
       {error && <div className="auth-error">{error}</div>}

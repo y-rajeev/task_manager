@@ -1,0 +1,289 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+/* Sticky Notes Styles */
+.sticky-notes-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+.sticky-note-card {
+  position: relative;
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.08), 0 1.5px 4px 0 rgba(0,0,0,0.04);
+  border-radius: 1rem;
+  transition: transform 0.08s;
+  cursor: pointer;
+  border: 1.5px solid #f3f3f3;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+.sticky-note-card:hover {
+  transform: scale(1.03) rotate(-1deg);
+  z-index: 2;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.18);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  position: relative;
+  min-width: 320px;
+  max-width: 400px;
+}
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.modal-input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1.5px solid #e5e7eb;
+  padding: 0.75rem;
+  font-size: 1rem;
+  resize: vertical;
+  background: #f9fafb;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+.modal-btn {
+  padding: 0.5rem 1.2rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.modal-btn.primary {
+  background: #2563eb;
+  color: #fff;
+}
+.modal-btn.cancel {
+  background: #f3f4f6;
+  color: #222;
+}
+
+/* Action Buttons */
+.action-btn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.4rem;
+  transition: background 0.12s;
+}
+.action-btn:hover {
+  background: #f3f4f6;
+}
+.action-btn.delete:hover {
+  background: #fee2e2;
+}
+
+/* Add Note Button */
+.add-task-btn {
+  background: #facc15;
+  color: #222;
+  font-weight: 700;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.6rem 1.5rem;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px 0 rgba(250,204,21,0.12);
+  transition: background 0.12s, box-shadow 0.12s;
+}
+.add-task-btn:hover {
+  background: #fde047;
+  box-shadow: 0 4px 16px 0 rgba(250,204,21,0.18);
+}
+
+/* Error Message */
+.auth-error {
+  color: #dc2626;
+  background: #fee2e2;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 240px;
+  min-width: 200px;
+  max-width: 280px;
+  background: #fff;
+  border-right: 1.5px solid #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 20;
+  transition: width 0.2s;
+}
+.sidebar.collapsed {
+  width: 64px;
+  min-width: 64px;
+}
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.2rem 1.2rem 0.5rem 1.2rem;
+}
+.sidebar-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2563eb;
+  letter-spacing: 0.02em;
+}
+.sidebar-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem;
+  border-radius: 0.4rem;
+  transition: background 0.12s;
+}
+.sidebar-toggle:hover {
+  background: #f3f4f6;
+}
+.sidebar-nav {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 1.2rem;
+}
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem 1.5rem;
+  color: #222;
+  text-decoration: none;
+  font-size: 1.08rem;
+  border-radius: 0.7rem;
+  transition: background 0.12s, color 0.12s;
+}
+.sidebar-link.active, .sidebar-link:hover {
+  background: #eef2ff;
+  color: #2563eb;
+}
+.sidebar-icon {
+  display: flex;
+  align-items: center;
+  font-size: 1.3rem;
+}
+.sidebar-label {
+  white-space: nowrap;
+}
+
+/* Topbar Profile Styles */
+.topbar-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: #f9fafb;
+  border-radius: 2rem;
+  padding: 0.3rem 1rem 0.3rem 0.5rem;
+  box-shadow: 0 2px 8px 0 rgba(37,99,235,0.04);
+}
+.topbar-profile-avatar {
+  width: 2.1rem;
+  height: 2.1rem;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.topbar-profile-name {
+  font-size: 1rem;
+  color: #222;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 140px;
+}
+.topbar-logout {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  border-radius: 0.4rem;
+  padding: 0.2rem 0.5rem;
+  transition: background 0.12s;
+}
+.topbar-logout:hover {
+  background: #fee2e2;
+}
+
+/* Remove sidebar-profile styles if not used elsewhere */
+.sidebar-profile, .sidebar-profile-info, .sidebar-profile-avatar, .sidebar-profile-name, .sidebar-logout {
+  all: unset;
+}

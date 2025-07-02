@@ -11,6 +11,7 @@ export default function AuthPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -75,14 +76,46 @@ export default function AuthPage() {
           className="auth-input"
           required
         />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          className="auth-input"
-          required
-        />
+        <div style={{ position: 'relative' }}>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            className="auth-input"
+            required
+            style={{ paddingRight: '2.5rem' }}
+          />
+          <button
+            type="button"
+            tabIndex={-1}
+            onClick={() => setShowPassword((v) => !v)}
+            style={{
+              position: 'absolute',
+              right: '0.7rem',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '1.8rem',
+              width: '2rem',
+            }}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? (
+              // Eye-off SVG
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#64748b" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-5 0-9-4.03-9-7 0-1.13.53-2.37 1.44-3.54m2.1-2.1C7.8 5.51 9.81 5 12 5c5 0 9 4.03 9 7 0 1.13-.53 2.37-1.44 3.54a8.98 8.98 0 0 1-2.1 2.1M15 12a3 3 0 0 0-3-3m0 0a3 3 0 0 0-3 3m3-3v.01M3 3l18 18" /></svg>
+            ) : (
+              // Eye SVG
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#64748b" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 0c0 2.97-4 7-9 7s-9-4.03-9-7c0-2.97 4-7 9-7s9 4.03 9 7Z" /></svg>
+            )}
+          </button>
+        </div>
         {error && <div className="auth-error">{error}</div>}
         {message && <div className="auth-success">{message}</div>}
         <button type="submit" className="auth-btn" disabled={loading}>
